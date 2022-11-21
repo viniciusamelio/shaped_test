@@ -23,6 +23,8 @@ class SignInUsecaseImpl implements SignInUsecase {
   Output<User> call(AuthCredential input) async {
     if (!isEmail(input.email)) {
       return Left(InvalidEmail());
+    } else if (input.password.isEmpty) {
+      return Left(InvalidPassword());
     }
     final userOrError = await _authRepository.signin(input);
     return userOrError;
@@ -48,18 +50,40 @@ void main() {
     });
 
     test(
-        "sut should return an InvalidEmail exception when input.email is an invalid email string",
-        () async {
-      final result = await sut(
-        AuthCredential(
-          email: "",
-          password: "",
-        ),
-      );
+      "sut should return an InvalidEmail exception when input.email is an invalid email string",
+      () async {
+        final result = await sut(
+          AuthCredential(
+            email: "",
+            password: "",
+          ),
+        );
 
-      expect(result.isLeft(), isTrue);
-      expect(result.fold((l) => l, (r) => null), isA<InvalidEmail>());
-      verifyNever(() => authRepository.signin(any())).called(0);
-    });
+        _expectLeft<InvalidEmail>(
+          result,
+        );
+        verifyNever(() => authRepository.signin(any())).called(0);
+      },
+    );
+    test(
+      "sut should return an InvalidPassword exception when input.password is an empty string",
+      () async {
+        final result = await sut(
+          AuthCredential(
+            email: faker.internet.email(),
+            password: "",
+          ),
+        );
+
+        _expectLeft<InvalidPassword>(
+          result,
+        );
+      },
+    );
   });
+}
+
+_expectLeft<T>(Either result) {
+  expect(result.isLeft(), isTrue);
+  expect(result.fold((l) => l, (r) => null), isA<T>());
 }
