@@ -43,7 +43,7 @@ void main() {
   );
 
   group("SignInUsecase: ", () {
-    setUpAll(() {
+    setUp(() {
       authRepository = MockedAuthRepository();
       sut = SignInUsecaseImpl(
         authRepository: authRepository,
@@ -88,11 +88,11 @@ void main() {
     test(
       "sut should return left when repository does so",
       () async {
-        (when(
+        when(
           () => authRepository.signin(
             any(),
           ),
-        )).thenAnswer(
+        ).thenAnswer(
           (invocation) async => Left(
             MockedException(),
           ),
@@ -101,6 +101,29 @@ void main() {
         final result = await sut(input);
 
         expectLeft<MockedException>(result);
+      },
+    );
+
+    test(
+      "sut should return right when repository does so",
+      () async {
+        when(
+          () => authRepository.signin(
+            any(),
+          ),
+        ).thenAnswer(
+          (invocation) async => Right(
+            User(
+              name: faker.person.name(),
+              email: faker.internet.email(),
+            ),
+          ),
+        );
+
+        final result = await sut(input);
+
+        expect(result.isRight(), isTrue);
+        verify(() => authRepository.signin(any())).called(1);
       },
     );
   });
