@@ -10,6 +10,8 @@ import 'package:shaped_test/domain/repositories/auth_repository.dart';
 import 'package:shaped_test/domain/usecases/signin_usecase.dart';
 import 'package:string_validator/string_validator.dart';
 
+import '../../test_utils.dart';
+
 class MockedAuthRepository extends Mock implements AuthRepository {}
 
 class SignInUsecaseImpl implements SignInUsecase {
@@ -35,6 +37,11 @@ void main() {
   late SignInUsecase sut;
   late AuthRepository authRepository;
 
+  final input = AuthCredential(
+    email: faker.internet.email(),
+    password: "aRandomPass",
+  );
+
   group("SignInUsecase: ", () {
     setUpAll(() {
       authRepository = MockedAuthRepository();
@@ -42,10 +49,7 @@ void main() {
         authRepository: authRepository,
       );
       registerFallbackValue(
-        AuthCredential(
-          email: faker.internet.email(),
-          password: "aRandomPass",
-        ),
+        input,
       );
     });
 
@@ -59,7 +63,7 @@ void main() {
           ),
         );
 
-        _expectLeft<InvalidEmail>(
+        expectLeft<InvalidEmail>(
           result,
         );
         verifyNever(() => authRepository.signin(any())).called(0);
@@ -75,15 +79,29 @@ void main() {
           ),
         );
 
-        _expectLeft<InvalidPassword>(
+        expectLeft<InvalidPassword>(
           result,
         );
       },
     );
-  });
-}
 
-_expectLeft<T>(Either result) {
-  expect(result.isLeft(), isTrue);
-  expect(result.fold((l) => l, (r) => null), isA<T>());
+    test(
+      "sut should return left when repository does so",
+      () async {
+        (when(
+          () => authRepository.signin(
+            any(),
+          ),
+        )).thenAnswer(
+          (invocation) async => Left(
+            MockedException(),
+          ),
+        );
+
+        final result = await sut(input);
+
+        expectLeft<MockedException>(result);
+      },
+    );
+  });
 }
