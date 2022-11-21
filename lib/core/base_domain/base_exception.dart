@@ -1,7 +1,7 @@
 abstract class BaseException implements Exception {
   BaseException({
     required this.message,
-    required this.stackTrace,
+    this.stackTrace,
     this.code,
   });
 
