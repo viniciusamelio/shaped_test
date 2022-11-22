@@ -2,6 +2,7 @@ import 'package:faker/faker.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:shaped_test/domain/entities/examination.dart';
 import 'package:shaped_test/domain/entities/user.dart';
 import 'package:shaped_test/core/shared/types.dart';
 import 'package:shaped_test/domain/errors/examination_exceptions.dart';
@@ -85,6 +86,33 @@ void main() {
       final result = await sut(input);
 
       expectLeft<MockedException>(result);
+    });
+
+    test("sut should return right when repository does so", () async {
+      when(
+        () => examinationRepository.get(
+          any(),
+        ),
+      ).thenAnswer(
+        (invocation) async => Right(
+          [
+            Examination(
+              id: 1,
+              patientName: faker.person.name(),
+              status: ExaminationStatus.finished,
+            ),
+            Examination(
+              id: 2,
+              patientName: faker.person.name(),
+              status: ExaminationStatus.processing,
+            ),
+          ],
+        ),
+      );
+
+      final result = await sut(input);
+
+      expect(result.isRight(), isTrue);
     });
   });
 }

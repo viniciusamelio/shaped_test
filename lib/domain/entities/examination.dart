@@ -12,7 +12,7 @@ class Examination implements BaseEntity {
     required this.status,
   });
 
-  final String id;
+  final int id;
   final String patientName;
   final ExaminationStatus status;
 }
