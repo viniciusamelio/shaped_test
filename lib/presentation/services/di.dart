@@ -5,16 +5,18 @@ import 'package:shaped_test/domain/usecases/get_examinations_usecase.dart';
 import 'package:shaped_test/domain/usecases/signin_usecase.dart';
 import 'package:shaped_test/infra/repositories/auth_repository.dart';
 import 'package:shaped_test/infra/repositories/examination_repository.dart';
+import 'package:shaped_test/presentation/controllers/auth_controller.dart';
+import 'package:shaped_test/presentation/controllers/auth_presenter.dart';
 
 abstract class DIService {
   static final KiwiContainer _container = KiwiContainer();
 
-  void init() {
+  static void init() {
     loginInjections();
     examinationsInjections();
   }
 
-  void loginInjections() {
+  static void loginInjections() {
     _container.registerFactory<AuthRepository>(
       (container) => AuthRepositoryImpl(),
     );
@@ -23,9 +25,14 @@ abstract class DIService {
         authRepository: container(),
       ),
     );
+    _container.registerFactory<AuthPresenter>(
+      (container) => AuthController(
+        signInUsecase: container(),
+      ),
+    );
   }
 
-  void examinationsInjections() {
+  static void examinationsInjections() {
     _container.registerFactory<ExaminationRepository>(
       (container) => ExaminationRepositoryImpl(),
     );
@@ -36,5 +43,5 @@ abstract class DIService {
     );
   }
 
-  T get<T>() => _container<T>();
+  static T get<T>() => _container<T>();
 }

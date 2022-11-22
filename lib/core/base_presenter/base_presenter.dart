@@ -6,6 +6,7 @@ abstract class BasePresenter extends ValueNotifier<BaseState> {
 
   Future<void> loading() async {
     value = LoadingState();
+    notifyListeners();
   }
 }
 

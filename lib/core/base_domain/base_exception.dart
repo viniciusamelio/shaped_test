@@ -8,4 +8,9 @@ abstract class BaseException implements Exception {
   final String message;
   final dynamic stackTrace;
   final int? code;
+
+  @override
+  String toString() {
+    return message;
+  }
 }
