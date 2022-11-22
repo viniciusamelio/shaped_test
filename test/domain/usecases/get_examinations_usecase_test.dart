@@ -1,6 +1,7 @@
 import 'package:faker/faker.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:shaped_test/domain/entities/user.dart';
 import 'package:shaped_test/core/shared/types.dart';
 import 'package:shaped_test/domain/errors/examination_exceptions.dart';
@@ -34,12 +35,15 @@ void main() {
   late GetExaminationsUsecase sut;
   late ExaminationRepository examinationRepository;
 
+  final input = User(name: "Amélio", email: faker.internet.email());
+
   group("GetExaminationsUsecase: ", () {
     setUp(() {
       examinationRepository = MockedExaminationRepository();
       sut = GetExaminationUsecaseImpl(
         examinationRepository: examinationRepository,
       );
+      registerFallbackValue(input);
     });
 
     test(
@@ -66,5 +70,21 @@ void main() {
         expectLeft<InvalidUser>(result);
       },
     );
+
+    test("sut should return left when repository does so", () async {
+      when(
+        () => examinationRepository.get(
+          any(),
+        ),
+      ).thenAnswer(
+        (invocation) async => Left(
+          MockedException(),
+        ),
+      );
+
+      final result = await sut(input);
+
+      expectLeft<MockedException>(result);
+    });
   });
 }
