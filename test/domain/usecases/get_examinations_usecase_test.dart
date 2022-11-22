@@ -76,14 +76,15 @@ void main() {
         (invocation) async => Right(
           [
             Examination(
-              id: 1,
-              patientName: faker.person.name(),
-              status: ExaminationStatus.finished,
-            ),
+                id: 1,
+                patientName: faker.person.name(),
+                status: ExaminationStatus.finished,
+                date: "20/12/2022"),
             Examination(
               id: 2,
               patientName: faker.person.name(),
               status: ExaminationStatus.processing,
+              date: "20/12/2022",
             ),
           ],
         ),

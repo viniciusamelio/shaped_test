@@ -10,9 +10,11 @@ class Examination implements BaseEntity {
     required this.id,
     required this.patientName,
     required this.status,
+    required this.date,
   });
 
   final int id;
   final String patientName;
   final ExaminationStatus status;
+  final String date;
 }
