@@ -1,3 +1,4 @@
+import 'package:faker/faker.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:shaped_test/domain/entities/user.dart';
@@ -42,13 +43,28 @@ void main() {
     });
 
     test(
-        "sut should return an InvalidUser exception when user email isnt valid",
-        () async {
-      final result = await sut(
-        User(name: "Vinicius", email: "aa.com"),
-      );
+      "sut should return an InvalidUser exception when user email isnt valid",
+      () async {
+        final result = await sut(
+          User(name: "Vinicius", email: "aa.com"),
+        );
 
-      expectLeft<InvalidUser>(result);
-    });
+        expectLeft<InvalidUser>(result);
+      },
+    );
+
+    test(
+      "sut should return an InvalidUser exception when user name is empty",
+      () async {
+        final result = await sut(
+          User(
+            name: "",
+            email: faker.internet.email(),
+          ),
+        );
+
+        expectLeft<InvalidUser>(result);
+      },
+    );
   });
 }
